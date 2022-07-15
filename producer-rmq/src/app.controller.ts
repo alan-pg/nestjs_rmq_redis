@@ -29,7 +29,7 @@ export class AppController {
 
   @Get('/position')
   publishPosition(): string {
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       const data = {
         id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
         cmd: 'HB',
