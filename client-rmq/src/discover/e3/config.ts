@@ -172,7 +172,8 @@ export const dateTime = (date: string, time: string) => {
 };
 
 export const status = (data: string, voltage: string) => {
-  const status = [];
+  const status: event[] = [];
+
   if (Number(data.charAt(0)) > 0) {
     const value = statusCode.bit1[data[0]];
     value && status.push(value);
@@ -233,13 +234,13 @@ export const command = (data: string): event[] => {
 export const signal = (data: string) => {
   const signal = Number(data);
   if (isNaN(signal)) return undefined;
-  if (signal > 32) return 100;
-  return Math.round(Number(data) * (100 / 32));
+  if (signal > 32) return '100';
+  return String(Math.round(Number(data) * (100 / 32)));
 };
 
-export const speed = (data: string) => parseInt(data, 16) / 100;
+export const speed = (data: string) => String(parseInt(data, 16) / 100);
 
-export const direction = (data: string) => parseInt(data, 16) / 100;
+export const direction = (data: string) => String(parseInt(data, 16) / 100);
 
 export const ignition = (data: string) => Number(data.charAt(2)) === 8;
 
@@ -247,7 +248,7 @@ export const out1 = (data: string) => Number(data.charAt(3)) === 8;
 
 export const out2 = (data: string) => Number(data.charAt(2)) === 1;
 
-export const odometer = (data: string) => parseInt(data, 16) / 10;
+export const odometer = (data: string) => String(parseInt(data, 16) / 10);
 
 export const satellite = (data: string) => data.slice(0, -1);
 

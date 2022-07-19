@@ -20,4 +20,4 @@ import { RedisModule } from 'src/database/redis/redis.module';
   ],
   exports: ['REDIS_LAST_POSITION'],
 })
-export class PositionModule { }
+export class PositionModule {}

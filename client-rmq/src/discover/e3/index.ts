@@ -1,3 +1,4 @@
+import { DiscoveryProps } from '..';
 import {
   status,
   speed,
@@ -15,7 +16,7 @@ import {
   command,
 } from './config';
 
-function handleHB(fields: string[]) {
+function handleHB(fields: string[]): DiscoveryProps {
   try {
     const treatedData = {
       cmd: fields[2],
@@ -36,24 +37,38 @@ function handleHB(fields: string[]) {
       odometer: odometer(fields[14]),
       voltage: fields[19],
       satellite: satellite(fields[20]),
-      type: ['position'],
     };
 
-    return treatedData;
+    return {
+      error: false,
+      ignore: false,
+      errorMessage: null,
+      event: null,
+      position: treatedData,
+    };
   } catch (error) {
     console.log('HB_error', error);
-    throw new Error('HB_error');
+    return {
+      error: true,
+      ignore: false,
+      errorMessage: 'HB_error',
+      event: null,
+      position: null,
+    };
   }
 }
 
-function handleAM(fields) {
+function handleAM(fields: string[]): DiscoveryProps {
   try {
     const voltage = fields[16];
     const events = status(fields[10], voltage);
 
     if (!events.length) {
       return {
-        type: 'event',
+        error: false,
+        errorMessage: null,
+        event: null,
+        position: null,
         ignore: true,
       };
     }
@@ -88,7 +103,13 @@ function handleAM(fields) {
       };
     });
 
-    return { type: ['event'], items: treatedEvents };
+    return {
+      error: false,
+      errorMessage: null,
+      ignore: false,
+      event: treatedEvents,
+      position: null,
+    };
   } catch (error) {
     console.log('AM_error', error);
     throw new Error('AM_error');
@@ -156,7 +177,7 @@ function handleFD(fields: string[]) {
   }
 }
 
-export function e3(data: string) {
+export function e3(data: string): DiscoveryProps {
   if (!data || typeof data !== 'string') throw new Error('data_is_missing');
   if (data.charAt(0) !== '*' || data.charAt(data.length - 1) !== '#') {
     throw new Error('invalid_data_structure');

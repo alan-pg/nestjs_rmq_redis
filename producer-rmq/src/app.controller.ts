@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly amqpConnection: AmqpConnection) { }
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   @Get('/event')
   publishEvent(): string {
@@ -29,21 +29,23 @@ export class AppController {
 
   @Get('/position')
   publishPosition(): string {
-    for (let i = 0; i < 100; i++) {
+    const imei = 454522183689854;
+    for (let i = 0; i < 100000; i++) {
       const data = {
         id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
         cmd: 'HB',
-        data: `*ET,354522183685853,HB,A,16070D,120410,80D16D65,818DEDCE,0898,22C4,40800000,7,100,00,00012E40,49,0619301407,0000000000,0000,${i},13#`,
+        data: `*ET,${imei},HB,A,16070D,120410,80D16D65,818DEDCE,0898,22C4,40800000,7,100,00,00012E40,49,0619301407,0000000000,0000,${i},19#`,
         device_id: null,
         complement: null,
         date: '2022-07-13 18:04:18',
         tracker_model: 'E3',
-        created_at: '2022-07-13 18:04:18',
-        updated_at: '2022-07-13 18:04:18',
+        created_at: '2022-09-13 18:04:18',
+        updated_at: '2022-09-13 18:04:18',
       };
       this.amqpConnection.publish('packages', 'package-position-route', {
         data,
       });
+      //imei++;
     }
     return 'position';
   }

@@ -11,19 +11,11 @@ export class AppService {
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: Client,
     private positionService: PositionService,
-  ) { }
+  ) {}
 
   async getHello(): Promise<string> {
-    const teste0 = await this.redis.set('teste', 'teste');
-    console.log(
-      '🚀 ~ file: app.service.ts ~ line 11 ~ AppService ~ getHello ~ teste0',
-      teste0,
-    );
-    const teste = await this.redis.get('teste');
-    console.log(
-      '🚀 ~ file: app.service.ts ~ line 11 ~ AppService ~ getHello ~ teste',
-      teste,
-    );
+    const teste0 = await this.positionService.getLpById();
+    teste0.forEach((t) => console.log(t.toJSON()));
     return 'Hello World!';
   }
 
@@ -39,11 +31,12 @@ export class AppService {
     console.log('nova msg', this.count);
     this.count = this.count + 1;
     const { tracker_model, cmd, data } = msg.data;
-    const teste = discovery(tracker_model, cmd, data);
+    const convertedData = discovery(tracker_model, cmd, data);
 
-    const id = await this.positionService.createOrUprateLastPosition(
-      teste as unknown as CreatePositionDto,
-    );
+    if (convertedData)
+      const id = await this.positionService.createOrUprateLastPosition(
+        convertedData as unknown as CreatePositionDto,
+      );
     return new Nack();
   }
 

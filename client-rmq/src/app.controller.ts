@@ -8,13 +8,13 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private positionService: LastPositionService,
-  ) { }
+  ) {}
 
   @Get()
   getHello(): Promise<string> {
     console.log('aqui');
     discovery('e3', 'HB', 'data');
-    return this.positionService.handlePosition('teste data');
+    return this.appService.getHello();
     // return this.appService.getHello();
   }
 }

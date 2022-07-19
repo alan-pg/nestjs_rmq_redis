@@ -23,4 +23,4 @@ import { Client } from 'redis-om';
   ],
   exports: ['REDIS_CLIENT'],
 })
-export class RedisModule { }
+export class RedisModule {}
