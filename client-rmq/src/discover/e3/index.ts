@@ -1,4 +1,4 @@
-import { DiscoveryProps } from '..';
+import { DiscoveredData, EventProps, PositionProps } from '..';
 import {
   status,
   speed,
@@ -16,7 +16,21 @@ import {
   command,
 } from './config';
 
-function handleHB(fields: string[]): DiscoveryProps {
+interface TreatedHb {
+  error: boolean;
+  errorMessage: string | null;
+  ignore: boolean;
+  position: PositionProps | null;
+}
+
+interface TreatedEvent {
+  error: boolean;
+  errorMessage: string | null;
+  ignore?: boolean;
+  event?: EventProps[] | null;
+}
+
+function handleHB(fields: string[]): TreatedHb {
   try {
     const treatedData = {
       cmd: fields[2],
@@ -43,7 +57,6 @@ function handleHB(fields: string[]): DiscoveryProps {
       error: false,
       ignore: false,
       errorMessage: null,
-      event: null,
       position: treatedData,
     };
   } catch (error) {
@@ -52,13 +65,12 @@ function handleHB(fields: string[]): DiscoveryProps {
       error: true,
       ignore: false,
       errorMessage: 'HB_error',
-      event: null,
       position: null,
     };
   }
 }
 
-function handleAM(fields: string[]): DiscoveryProps {
+function handleAM(fields: string[]): DiscoveredData {
   try {
     const voltage = fields[16];
     const events = status(fields[10], voltage);
@@ -68,7 +80,6 @@ function handleAM(fields: string[]): DiscoveryProps {
         error: false,
         errorMessage: null,
         event: null,
-        position: null,
         ignore: true,
       };
     }
@@ -106,13 +117,14 @@ function handleAM(fields: string[]): DiscoveryProps {
     return {
       error: false,
       errorMessage: null,
-      ignore: false,
       event: treatedEvents,
-      position: null,
     };
   } catch (error) {
     console.log('AM_error', error);
-    throw new Error('AM_error');
+    return {
+      error: true,
+      errorMessage: 'AM_error',
+    };
   }
 }
 
@@ -150,10 +162,15 @@ function handleCC(fields: string[]) {
   }
 }
 
-function handleFD(fields: string[]) {
+function handleFD(fields: string[]): TreatedEvent {
   try {
     const commandEvents = command(fields[3]);
-    if (!commandEvents.length) throw new Error('invalid_command');
+    if (!commandEvents.length) {
+      return {
+        error: true,
+        errorMessage: 'invalid_command',
+      };
+    }
 
     const treatedData = {
       header: fields[0],
@@ -170,18 +187,36 @@ function handleFD(fields: string[]) {
       };
     });
 
-    return { type: ['event', 'command'], items: treatedCommands };
+    return {
+      error: false,
+      errorMessage: null,
+      event: treatedCommands,
+    };
   } catch (error) {
     console.log('FD_error', error);
-    throw new Error('FD_error');
+    return {
+      error: true,
+      errorMessage: 'FD_error',
+      ignore: false,
+    };
   }
 }
 
-export function e3(data: string): DiscoveryProps {
-  if (!data || typeof data !== 'string') throw new Error('data_is_missing');
-  if (data.charAt(0) !== '*' || data.charAt(data.length - 1) !== '#') {
-    throw new Error('invalid_data_structure');
+export function e3(data: string): DiscoveredData {
+  if (!data || typeof data !== 'string') {
+    return {
+      error: true,
+      errorMessage: 'data_is_missing',
+    };
   }
+
+  if (data.charAt(0) !== '*' || data.charAt(data.length - 1) !== '#') {
+    return {
+      error: true,
+      errorMessage: 'invalid_data_structure',
+    };
+  }
+
   const fields = data.split(',');
   const cmd = fields[2];
 
@@ -191,10 +226,13 @@ export function e3(data: string): DiscoveryProps {
     case 'AM':
       return handleAM(fields);
     case 'CC':
-      return handleCC(fields);
+      return { error: false, errorMessage: null, ignore: true };
     case 'FD':
       return handleFD(fields);
     default:
-      throw new Error('cmd_not_found');
+      return {
+        error: true,
+        errorMessage: 'cmd_not_found',
+      };
   }
 }

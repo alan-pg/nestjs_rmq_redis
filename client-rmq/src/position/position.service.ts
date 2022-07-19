@@ -1,26 +1,23 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { Repository } from 'redis-om';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { LastPosition } from './entities/last-position.entity';
+import { Position } from './entities/position.entity';
 
 @Injectable()
 export class PositionService {
   constructor(
     @Inject('REDIS_LAST_POSITION')
     private readonly lastPositionRepo: Repository<LastPosition>,
-  ) {}
-  async sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+    @InjectModel(Position)
+    private positionModel: typeof Position,
+  ) { }
+
   async createOrUprateLastPosition(
     position: CreatePositionDto,
   ): Promise<string> {
-    // await this.sleep(10000)
-
-    console.log('CRIA NOVO');
     const lastPos = this.lastPositionRepo.createEntity({
-      keyName: 'teste123',
-      entityId: '123456',
       deviceId: Number(position.deviceId) || null,
       header: position.header || null,
       dateTime: position.dateTime || null,
@@ -43,7 +40,11 @@ export class PositionService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     lastPos.entityId = position.deviceId;
-
+    const teste = await this.positionModel.create({ deviceId: '1234456' });
+    console.log(
+      '🚀 ~ file: position.service.ts ~ line 44 ~ PositionService ~ teste',
+      teste,
+    );
     return this.lastPositionRepo.save(lastPos);
   }
 

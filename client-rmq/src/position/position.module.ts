@@ -3,9 +3,11 @@ import { PositionService } from './position.service';
 import { Client } from 'redis-om';
 import { lastPositionSchema } from './entities/last-position.entity';
 import { RedisModule } from 'src/database/redis/redis.module';
+import { Position } from './entities/position.entity';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
-  imports: [RedisModule],
+  imports: [RedisModule, SequelizeModule.forFeature([Position])],
   providers: [
     PositionService,
     {
@@ -18,6 +20,6 @@ import { RedisModule } from 'src/database/redis/redis.module';
       },
     },
   ],
-  exports: ['REDIS_LAST_POSITION'],
+  exports: ['REDIS_LAST_POSITION', SequelizeModule],
 })
-export class PositionModule {}
+export class PositionModule { }

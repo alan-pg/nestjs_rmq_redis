@@ -1,17 +1,19 @@
 import { Nack, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Inject, Injectable } from '@nestjs/common';
 import { Client } from 'redis-om';
-import { discovery } from './discover';
+import { discover } from './discover';
 import { CreatePositionDto } from './position/dto/create-position.dto';
 import { PositionService } from './position/position.service';
 import { ConsumeMessage } from 'amqplib';
+import { EventService } from './event/event.service';
 @Injectable()
 export class AppService {
   private count = 1;
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: Client,
     private positionService: PositionService,
-  ) {}
+    private eventService: EventService,
+  ) { }
 
   async getHello(): Promise<string> {
     const teste0 = await this.positionService.getLpById();
@@ -30,13 +32,29 @@ export class AppService {
   ) {
     console.log('nova msg', this.count);
     this.count = this.count + 1;
-    const { tracker_model, cmd, data } = msg.data;
-    const convertedData = discovery(tracker_model, cmd, data);
+    const { tracker_model, data } = msg.data;
+    const convertedData = discover({ model: tracker_model, data });
 
-    if (convertedData)
+    if (convertedData.error) {
+      console.log('error', convertedData.errorMessage);
+    }
+
+    if (convertedData.ignore) {
+      console.log('ignore ');
+    }
+
+    if (convertedData.position) {
+      console.log('save position');
       const id = await this.positionService.createOrUprateLastPosition(
-        convertedData as unknown as CreatePositionDto,
+        convertedData.position as unknown as CreatePositionDto,
       );
+    }
+
+    if (convertedData.event) {
+      console.log('save event');
+      await this.eventService.createEvent(convertedData.event);
+    }
+
     return new Nack();
   }
 

@@ -22,10 +22,6 @@ export class LastPosition extends Entity {
   signal: string | null;
   out1: boolean | null;
   out2: boolean | null;
-
-  generateId() {
-    return '123456789';
-  }
 }
 
 /* create a Schema for Person */

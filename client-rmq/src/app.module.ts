@@ -3,12 +3,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RedisModule } from './database/redis/redis.module';
-import { LastPositionModule } from './position2/last-position.module';
-import { LastPositionService } from './position2/last-position.service';
 import { PositionModule } from './position/position.module';
-import { SequelizeModule } from '@nestjs/sequelize';
+// import { SequelizeModule } from '@nestjs/sequelize';
 import { Position } from './position/entities/position.entity';
 import { PositionService } from './position/position.service';
+import { EventModule } from './event/event.module';
+import { EventService } from './event/event.service';
+import { Event } from './event/entities/event.entity';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
   imports: [
@@ -21,7 +23,6 @@ import { PositionService } from './position/position.service';
       ],
       uri: 'amqp://admin:admin@localhost:5672',
       connectionInitOptions: { wait: false },
-      
     }),
     SequelizeModule.forRoot({
       dialect: 'mysql',
@@ -30,13 +31,14 @@ import { PositionService } from './position/position.service';
       username: 'root',
       password: '123456',
       database: 'treatment',
-      models: [Position],
+      autoLoadModels: true,
+      synchronize: true,
     }),
     RedisModule,
-    LastPositionModule,
     PositionModule,
+    EventModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LastPositionService, PositionService],
+  providers: [AppService, PositionService, EventService],
 })
 export class AppModule { }
