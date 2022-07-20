@@ -2,7 +2,8 @@ version: "3"
 
 services:
   rabbitmq:
-    image: "rabbitmq:3.8-management-alpine"
+    build: .
+    #image: "rabbitmq:3.8-management-alpine"
     container_name: nodejs-rabbitmq-rabbitmq
     hostname: rabbitmq
     ports:

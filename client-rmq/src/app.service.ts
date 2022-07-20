@@ -13,7 +13,7 @@ export class AppService {
     @Inject('REDIS_CLIENT') private readonly redis: Client,
     private positionService: PositionService,
     private eventService: EventService,
-  ) { }
+  ) {}
 
   async getHello(): Promise<string> {
     const teste0 = await this.positionService.getLpById();
@@ -30,6 +30,16 @@ export class AppService {
     msg: { data: any },
     amqpMsg: ConsumeMessage,
   ) {
+    console.log(
+      '🚀 ~ file: app.service.ts ~ line 33 ~ AppService ~ amqpMsg',
+      amqpMsg,
+    );
+    /*    amqpMsg.properties.headers = {
+      'x-retry': 1,
+      'x-retry-limit': 5,
+      'x-delay': 100000,
+    }; */
+    return new Nack(true);
     console.log('nova msg', this.count);
     this.count = this.count + 1;
     const { tracker_model, data } = msg.data;

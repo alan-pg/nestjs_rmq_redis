@@ -12,7 +12,7 @@ export class PositionService {
     private readonly lastPositionRepo: Repository<LastPosition>,
     @InjectModel(Position)
     private positionModel: typeof Position,
-  ) { }
+  ) {}
 
   async createOrUprateLastPosition(
     position: CreatePositionDto,
@@ -40,11 +40,8 @@ export class PositionService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     lastPos.entityId = position.deviceId;
-    const teste = await this.positionModel.create({ deviceId: '1234456' });
-    console.log(
-      '🚀 ~ file: position.service.ts ~ line 44 ~ PositionService ~ teste',
-      teste,
-    );
+    const teste = await this.positionModel.create({ ...position });
+
     return this.lastPositionRepo.save(lastPos);
   }
 
