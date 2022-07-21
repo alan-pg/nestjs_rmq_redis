@@ -8,7 +8,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '',
+      password: '123456',
       database: 'treatment',
       logging: false,
       autoLoadModels: true,
@@ -16,4 +16,4 @@ import { SequelizeModule } from '@nestjs/sequelize';
     }),
   ],
 })
-export class SequelizeDbModule {}
+export class SequelizeDbModule { }

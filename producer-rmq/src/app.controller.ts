@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly amqpConnection: AmqpConnection) {}
+  constructor(private readonly amqpConnection: AmqpConnection) { }
 
   @Get('/event')
   publishEvent(): string {
@@ -21,7 +21,7 @@ export class AppController {
       created_at: '2022-07-13 18:04:18',
       updated_at: '2022-07-13 18:04:18',
     };
-    this.amqpConnection.publish('packages', 'package-event-route', {
+    this.amqpConnection.publish('packages', 'package-position-route', {
       data,
     });
     return 'event';
@@ -45,7 +45,7 @@ export class AppController {
       const data = {
         id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
         cmd: 'HB',
-        data: packages[0],
+        data: '*ET,354522183685853,HB,A,16070D,120410,80D16D65,818DEDCE,0898,22C4,40800000,7,100,00,00012E40,49,0619301407,0000000000,0000,13.80,13#',
         device_id: null,
         complement: null,
         date: '2022-07-13 18:04:18',
@@ -63,7 +63,7 @@ export class AppController {
           headers: {
             'x-retry': 1,
             'x-retry-limit': 5,
-            'x-delay': 100000,
+            'x-delay': 100,
           },
         },
       );
@@ -71,26 +71,37 @@ export class AppController {
     }
     return 'position';
   }
-  /* 
-  @Cron('* * * * * *')
-  handleCron() {
-    for (let i = 0; i < 1000; i++) {
-      const data = {
-        id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
-        cmd: 'HB',
-        data: '*ET,354522183685853,HB,A,16070D,120410,80D16D65,818DEDCE,0898,22C4,40800000,7,100,00,00012E40,49,0619301407,0000000000,0000,13.80,13#',
-        device_id: null,
-        complement: null,
-        date: '2022-07-13 18:04:18',
-        tracker_model: 'E3',
-        attempts: 0,
-        created_at: '2022-07-13 18:04:18',
-        updated_at: '2022-07-13 18:04:18',
-      };
-      this.amqpConnection.publish('packages', 'package-position-route', {
-        data,
-      });
-    }
-    console.log('feito');
-  } */
+
+  // @Cron('* * * * * *')
+  // handleCron() {
+  //   for (let i = 0; i < 200; i++) {
+  //     const data = {
+  //       id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
+  //       cmd: 'HB',
+  //       data: '*ET,354522183685853,HB,A,16070D,120410,80D16D65,818DEDCE,0898,22C4,40800000,7,100,00,00012E40,49,0619301407,0000000000,0000,13.80,13#',
+  //       device_id: null,
+  //       complement: null,
+  //       date: '2022-07-13 18:04:18',
+  //       tracker_model: 'E3',
+  //       attempts: 0,
+  //       created_at: '2022-07-13 18:04:18',
+  //       updated_at: '2022-07-13 18:04:18',
+  //     };
+  //     const dataAm = {
+  //       id: '07f1b27f-d4c3-4a5a-8646-157a753b8888',
+  //       cmd: 'HB',
+  //       data: '*ET,354522183767974,AM,A,160713,130E29,80D18CCE,818F7C9A,0C1C,82DC,40800001,5,100,00,0000830D,27,14.35,13#',
+  //       device_id: null,
+  //       complement: null,
+  //       date: '2022-07-13 18:04:18',
+  //       tracker_model: 'E3',
+  //       attempts: 0,
+  //       created_at: '2022-07-13 18:04:18',
+  //       updated_at: '2022-07-13 18:04:18',
+  //     };
+  //     this.amqpConnection.publish('packages', 'package-position-route', data);
+  //     this.amqpConnection.publish('packages', 'package-position-route', dataAm);
+  //   }
+  //   console.log('feito');
+  // }
 }

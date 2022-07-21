@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  rabbitmq:
+    build: .
+    #image: "rabbitmq:3.8-management-alpine"
+    container_name: rabbitmq_treatment
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    restart: on-failure
+    volumes:
+      - "./.rabbitmq_data:/var/lib/rabbitmq/mnesia"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  redis:
+    image: "redis/redis-stack:latest"
+    container_name: redis_treatment
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    restart: on-failure
+    volumes:
+      - ./.redis_data:/data
+  mysql:
+    image: mysql
+    container_name: mysql_treatment
+    restart: on-failure
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=treatment
+    volumes:
+      - ./.mysql_data:/data
+    ports:
+      - 3306:3306
+    expose:
+      - 3306

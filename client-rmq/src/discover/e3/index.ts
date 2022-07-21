@@ -52,6 +52,7 @@ function handleHB(fields: string[]): TreatedHb {
       voltage: fields[19],
       satellite: satellite(fields[20]),
     };
+    throw new Error('teste');
 
     return {
       error: false,
@@ -60,11 +61,11 @@ function handleHB(fields: string[]): TreatedHb {
       position: treatedData,
     };
   } catch (error) {
-    console.log('HB_error', error);
+    console.log('HB_error', error.message);
     return {
       error: true,
       ignore: false,
-      errorMessage: 'HB_error',
+      errorMessage: 'handle_hb_error',
       position: null,
     };
   }
@@ -123,7 +124,7 @@ function handleAM(fields: string[]): DiscoveredData {
     console.log('AM_error', error);
     return {
       error: true,
-      errorMessage: 'AM_error',
+      errorMessage: 'handle_am_error',
     };
   }
 }
@@ -196,7 +197,7 @@ function handleFD(fields: string[]): TreatedEvent {
     console.log('FD_error', error);
     return {
       error: true,
-      errorMessage: 'FD_error',
+      errorMessage: 'handle_fd_error',
       ignore: false,
     };
   }

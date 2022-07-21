@@ -9,6 +9,8 @@ import { EventModule } from './event/event.module';
 import { EventService } from './event/event.service';
 import { Module } from '@nestjs/common';
 import { SequelizeDbModule } from './database/sequelize/sequelize.module';
+import { PackageFailsModule } from './package-fails/package-fails.module';
+import { PackageFailsService } from './package-fails/package-fails.service';
 
 @Module({
   imports: [
@@ -39,8 +41,9 @@ import { SequelizeDbModule } from './database/sequelize/sequelize.module';
     SequelizeDbModule,
     PositionModule,
     EventModule,
+    PackageFailsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PositionService, EventService],
+  providers: [AppService, PositionService, EventService, PackageFailsService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { Client } from 'redis-om';
 import { RedisModule } from 'src/database/redis/redis.module';
 import { eventTemporarySchema } from './entities/event-cache.entity';
+import { Event } from './entities/event.entity';
 import { EventService } from './event.service';
 
 @Module({
-  imports: [RedisModule],
+  imports: [RedisModule, SequelizeModule.forFeature([Event])],
   providers: [
     EventService,
     {
@@ -18,6 +20,6 @@ import { EventService } from './event.service';
       },
     },
   ],
-  exports: ['REDIS_EVENT'],
+  exports: ['REDIS_EVENT', SequelizeModule],
 })
 export class EventModule { }

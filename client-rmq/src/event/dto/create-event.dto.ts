@@ -1,4 +1,5 @@
 export class CreateEventDto {
+    id: string;
     header: string;
     deviceId: string;
     dateSystem: string;

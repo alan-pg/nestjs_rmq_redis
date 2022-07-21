@@ -1,6 +1,13 @@
-import { Column, Model, Table, PrimaryKey } from 'sequelize-typescript';
+import { randomUUID } from 'crypto';
+import {
+    Column,
+    Model,
+    Table,
+    PrimaryKey,
+    BeforeCreate,
+} from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'events' })
 export class Event extends Model {
     @PrimaryKey
     @Column
@@ -71,4 +78,9 @@ export class Event extends Model {
 
     @Column
     treatedEventId: string;
+
+    @BeforeCreate
+    static generateId(instance: Event): void {
+        instance.id = randomUUID();
+    }
 }

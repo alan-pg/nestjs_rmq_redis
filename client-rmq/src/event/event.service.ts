@@ -1,16 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { Repository } from 'redis-om';
 import { CreateEventDto } from './dto/create-event.dto';
 import { EventTemporary } from './entities/event-cache.entity';
+import { Event } from './entities/event.entity';
 
 @Injectable()
 export class EventService {
   constructor(
     @Inject('REDIS_EVENT')
     private readonly eventRepository: Repository<EventTemporary>,
+    @InjectModel(Event)
+    private eventModel: typeof Event,
   ) { }
   async createEvent(events: CreateEventDto[]) {
-    const teste = await Promise.all(
+    const cachedIds = await Promise.all(
       events.map((e) => {
         const eventRedis = this.eventRepository.createEntity({
           deviceId: Number(e.deviceId),
@@ -36,6 +40,12 @@ export class EventService {
         });
 
         return this.eventRepository.save(eventRedis);
+      }),
+    );
+
+    const savedEvents = await Promise.all(
+      events.map((e) => {
+        return this.eventModel.create({ ...e });
       }),
     );
 
