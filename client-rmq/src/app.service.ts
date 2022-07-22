@@ -1,6 +1,8 @@
 import {
+  AssertQueueErrorHandler,
   MessageErrorHandler,
   Nack,
+  QueueOptions,
   RabbitSubscribe,
 } from '@golevelup/nestjs-rabbitmq';
 import { Inject, Injectable } from '@nestjs/common';
@@ -8,9 +10,9 @@ import { Client } from 'redis-om';
 import { discover } from './discover';
 import { CreatePositionDto } from './position/dto/create-position.dto';
 import { PositionService } from './position/position.service';
-import { Channel, ConsumeMessage, ConsumeMessageFields } from 'amqplib';
 import { EventService } from './event/event.service';
 import { PackageFailsService } from './package-fails/package-fails.service';
+import { Channel, ConsumeMessage } from 'amqplib';
 @Injectable()
 export class AppService {
   private count = 1;
@@ -19,7 +21,7 @@ export class AppService {
     private positionService: PositionService,
     private eventService: EventService,
     private packageFailService: PackageFailsService,
-  ) { }
+  ) {}
 
   async getHello(): Promise<string> {
     const teste0 = await this.positionService.getLpById();
@@ -35,15 +37,20 @@ export class AppService {
       console.log('errorHandler');
     },
     queueOptions: {
-      deadLetterExchange: 'DELAY',
+      deadLetterExchange: 'package-dead-letter',
+      deadLetterRoutingKey: 'package-position-route',
+      durable: true,
     },
   })
   public async pubSubHandlerPosition(
     msg: { data: any },
     amqpMsg: ConsumeMessage,
   ) {
-    console.log('nova msg', this.count);
+    console.log('nova msg', amqpMsg.fields);
     this.count = this.count + 1;
+    throw new Error('teste');
+    return new Nack();
+
     const { tracker_model, data, cmd } = msg.data;
     const convertedData = discover({ model: tracker_model, data });
 

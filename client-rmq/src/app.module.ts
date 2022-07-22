@@ -1,4 +1,7 @@
-import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import {
+  MessageHandlerErrorBehavior,
+  RabbitMQModule,
+} from '@golevelup/nestjs-rabbitmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RedisModule } from './database/redis/redis.module';
@@ -15,23 +18,29 @@ import { PackageFailsService } from './package-fails/package-fails.service';
 @Module({
   imports: [
     RabbitMQModule.forRoot(RabbitMQModule, {
+      defaultSubscribeErrorBehavior: MessageHandlerErrorBehavior.NACK,
       exchanges: [
         {
           name: 'packages',
           type: 'topic',
-        },
-        {
-          name: 'DELAY',
-          type: 'x-delayed-message',
           options: {
-            autoDelete: false,
-            durable: true,
             arguments: {
-              'x-delayed-type': 'fanout',
-              'dead-letter-exchange': 'DLX.DEAD.LETTERS',
+              'x-dead-letter-exchange': 'package-dead-letter',
+              'x-dead-letter-routing-key': 'package-position-route',
             },
           },
         },
+        {
+          name: 'package-dead-letter',
+          type: 'topic',
+          options: {
+            durable: true,
+          },
+        },
+        /* {
+          name:'teste',
+          type: 
+        } */
       ],
       prefetchCount: 20,
       uri: 'amqp://admin:admin@localhost:5672',
@@ -46,4 +55,4 @@ import { PackageFailsService } from './package-fails/package-fails.service';
   controllers: [AppController],
   providers: [AppService, PositionService, EventService, PackageFailsService],
 })
-export class AppModule { }
+export class AppModule {}

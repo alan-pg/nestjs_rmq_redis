@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly amqpConnection: AmqpConnection) { }
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   @Get('/event')
   publishEvent(): string {
@@ -53,6 +53,7 @@ export class AppController {
         created_at: '2022-09-13 18:04:18',
         updated_at: '2022-09-13 18:04:18',
       };
+
       this.amqpConnection.publish(
         'packages',
         'package-position-route',
@@ -60,11 +61,11 @@ export class AppController {
           data,
         },
         {
-          headers: {
-            'x-retry': 1,
-            'x-retry-limit': 5,
-            'x-delay': 100,
-          },
+          /*  headers: {
+            ['x-retry']: 1,
+            ['x-retry-limit']: 5,
+            ['x-delay']: 5000,
+          }, */
         },
       );
       //imei++;
