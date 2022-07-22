@@ -52,7 +52,6 @@ function handleHB(fields: string[]): TreatedHb {
       voltage: fields[19],
       satellite: satellite(fields[20]),
     };
-    throw new Error('teste');
 
     return {
       error: false,

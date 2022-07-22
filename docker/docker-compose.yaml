@@ -11,7 +11,12 @@ services:
       - "5672:5672"
     restart: on-failure
     volumes:
-      - "./.rabbitmq_data:/var/lib/rabbitmq/mnesia"
+      # - ./rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins
+      # - ./rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+      # - ./rabbitmq-defs.json:/etc/rabbitmq/rabbitmq-defs.json
+      # - ./rmqinit/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      # - ./rmqinit/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./.rabbitmq_data:/var/lib/rabbitmq/mnesia
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin

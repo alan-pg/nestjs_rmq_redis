@@ -5,10 +5,12 @@ import {
     Table,
     PrimaryKey,
     BeforeCreate,
+    IsUUID,
 } from 'sequelize-typescript';
 
 @Table({ tableName: 'events' })
 export class Event extends Model {
+    @IsUUID(4)
     @PrimaryKey
     @Column
     id: string;
@@ -79,8 +81,8 @@ export class Event extends Model {
     @Column
     treatedEventId: string;
 
-    @BeforeCreate
-    static generateId(instance: Event): void {
-        instance.id = randomUUID();
-    }
+    // @BeforeCreate
+    // static generateId(instance: Event): void {
+    //     instance.id = randomUUID();
+    // }
 }

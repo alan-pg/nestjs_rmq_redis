@@ -12,7 +12,7 @@ export class PackageFailsService {
 
   async create(packageFail: CreatePackageFailDto) {
     try {
-      await this.packageFailModel.create({ ...packageFail });
+      await this.packageFailModel.create({ ...packageFail, date: new Date() });
       return { error: false };
     } catch (error) {
       return { error: true };

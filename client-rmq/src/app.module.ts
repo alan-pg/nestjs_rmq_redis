@@ -24,6 +24,7 @@ import { PackageFailsService } from './package-fails/package-fails.service';
           name: 'packages',
           type: 'topic',
           options: {
+            durable: true,
             arguments: {
               'x-dead-letter-exchange': 'package-dead-letter',
               'x-dead-letter-routing-key': 'package-position-route',
@@ -42,7 +43,6 @@ import { PackageFailsService } from './package-fails/package-fails.service';
           type: 
         } */
       ],
-      prefetchCount: 20,
       uri: 'amqp://admin:admin@localhost:5672',
       connectionInitOptions: { wait: false },
     }),
@@ -55,4 +55,4 @@ import { PackageFailsService } from './package-fails/package-fails.service';
   controllers: [AppController],
   providers: [AppService, PositionService, EventService, PackageFailsService],
 })
-export class AppModule {}
+export class AppModule { }

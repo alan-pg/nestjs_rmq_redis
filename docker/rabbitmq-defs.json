@@ -1,0 +1,32 @@
+{
+    "exchanges": [
+        {
+            "name": "YOUR-QUEUE-NAME",
+            "vhost": "/",
+            "type": "fanout",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        }
+    ],
+    "queues": [
+        {
+            "name": "YOUR-QUEUE-NAME",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        }
+    ],
+    "bindings": [
+        {
+            "source": "YOUR-QUEUE-NAME",
+            "vhost": "/",
+            "destination": "YOUR-QUEUE-NAME",
+            "destination_type": "queue",
+            "routing_key": "*",
+            "arguments": {}
+        }
+    ]
+}

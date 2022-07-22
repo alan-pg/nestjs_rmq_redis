@@ -5,22 +5,19 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly amqpConnection: AmqpConnection) {}
+  constructor(private readonly amqpConnection: AmqpConnection) { }
 
   @Get('/event')
   publishEvent(): string {
     const data = {
-      id: '1eb3e3e0-2418-4af2-aed9-ccd741ea8521',
       cmd: 'AM',
-      data: '*ET,354522182154331,AM,V,16070D,0E2320,80D0A1CE,818C4FC8,0000,6784,00040000,21,100,00,00030344,80,12.49,9#',
+      data: '78781f12160716132816c90272d2a604adf23100180002d4050b69004e5405004cfe0d0a',
       device_id: null,
       complement: null,
       date: '2022-07-13 14:35:33',
       tracker_model: 'E3',
-      attempts: 0,
-      created_at: '2022-07-13 18:04:18',
-      updated_at: '2022-07-13 18:04:18',
     };
+    this.amqpConnection.managedChannel.assertQueue;
     this.amqpConnection.publish('packages', 'package-position-route', {
       data,
     });

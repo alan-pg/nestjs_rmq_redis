@@ -21,7 +21,7 @@ export class AppService {
     private positionService: PositionService,
     private eventService: EventService,
     private packageFailService: PackageFailsService,
-  ) {}
+  ) { }
 
   async getHello(): Promise<string> {
     const teste0 = await this.positionService.getLpById();
@@ -46,31 +46,32 @@ export class AppService {
     msg: { data: any },
     amqpMsg: ConsumeMessage,
   ) {
-    console.log('nova msg', amqpMsg.fields);
+    console.log('x-death', amqpMsg.properties.headers['x-death']);
+    console.log('properties', amqpMsg.properties);
     this.count = this.count + 1;
-    throw new Error('teste');
-    return new Nack();
 
     const { tracker_model, data, cmd } = msg.data;
+
     const convertedData = discover({ model: tracker_model, data });
 
     if (convertedData.error) {
       console.log('error', convertedData.errorMessage);
       const { error } = await this.packageFailService.create({
         data: data,
-        date: new Date(),
         reason: convertedData.errorMessage,
         trackerModel: tracker_model,
         cmd,
       });
       if (error) {
         console.log('erro ao salvar packageFailService');
+        return new Nack();
       }
+      return;
     }
 
     if (convertedData.ignore) {
-      console.log('ignore nack()');
-      return new Nack();
+      console.log('ignore');
+      return;
     }
 
     if (convertedData.position) {
@@ -79,28 +80,44 @@ export class AppService {
         convertedData.position as unknown as CreatePositionDto,
       );
       if (error) {
-        console.log('position nack()');
         return new Nack();
       }
+      return;
     }
 
     if (convertedData.event) {
       console.log('save event');
-      await this.eventService.createEvent(convertedData.event);
+      const { error } = await this.eventService.createEvent(
+        convertedData.event,
+      );
+      if (error) {
+        return new Nack();
+      }
+      return;
     }
   }
 
-  @RabbitSubscribe({
-    // exchange: 'packages',
-    // routingKey: 'package-event-route',
-    queue: 'event',
-  })
-  public async pubSubHandlerEvent(msg: { [key: string]: any }) {
-    const { data } = msg;
-    console.log(
-      '🚀 ~ file: app.service.ts ~ line 39 ~ AppService ~ pubSubHandlerEvent ~ data',
-      data,
-    );
-    // console.log('msg', msg);
-  }
+  // @RabbitSubscribe({
+  //   exchange: 'package-dead-letter',
+  //   routingKey: 'package-position-route',
+  //   queue: 'recovery',
+  //   queueOptions: {
+  //     deadLetterExchange: 'packages',
+  //     deadLetterRoutingKey: 'package-position-route',
+  //     durable: true,
+  //     messageTtl: 10000,
+  //   },
+  // })
+  // public async pubSubHandlerEvent(
+  //   msg: { [key: string]: any },
+  //   amqpMsg: ConsumeMessage,
+  // ) {
+  //   const { data } = msg;
+  //   console.log(
+  //     '🚀 ~ file: app.service.ts ~ line 98 ~ AppService ~ pubSubHandlerEvent ~ amqpMsg',
+  //     amqpMsg.properties,
+  //   );
+
+  //   // console.log('msg', msg);
+  // }
 }

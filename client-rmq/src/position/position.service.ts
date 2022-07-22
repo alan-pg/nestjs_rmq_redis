@@ -16,7 +16,7 @@ export class PositionService {
 
   async createOrUprateLastPosition(
     position: CreatePositionDto,
-  ): Promise<{ error: boolean }> {
+  ): Promise<{ error: boolean; errorMessage?: string }> {
     let lpSavedId: string;
     try {
       const lastPos = this.lastPositionRepo.createEntity({
@@ -44,16 +44,17 @@ export class PositionService {
       lastPos.entityId = position.deviceId;
       lpSavedId = await this.lastPositionRepo.save(lastPos);
     } catch (error) {
-      console.log('erro ao salver position no redis');
-      return { error: true };
+      console.log('erro ao salvar position no redis');
+      return { error: true, errorMessage: 'save_redis_position_error' };
     }
     try {
       await this.positionModel.create({ ...position });
     } catch (error) {
-      console.log('erro ao salvar position no mysql');
+      console.log('erro ao salvar position no mysql', error);
       await this.lastPositionRepo.remove(lpSavedId);
-      return { error: true };
+      return { error: true, errorMessage: 'save_mysql_position_error' };
     }
+    return { error: false };
   }
 
   getLpById() {
