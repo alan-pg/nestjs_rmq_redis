@@ -1,4 +1,5 @@
 import { e3 } from './e3';
+import { suntech } from './suntech';
 
 export type PositionProps = {
   cmd: string;
@@ -19,6 +20,7 @@ export type PositionProps = {
   odometer: string;
   voltage: string;
   satellite: string;
+  heartBeat: string;
 };
 
 export type EventProps = {
@@ -61,6 +63,8 @@ export function discover({
   switch (model) {
     case 'E3':
       return e3(data);
+    case 'SUNTECH':
+      return suntech(data);
     default:
       return {
         error: true,

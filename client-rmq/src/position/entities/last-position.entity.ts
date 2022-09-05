@@ -22,6 +22,7 @@ export class LastPosition extends Entity {
   signal: string | null;
   out1: boolean | null;
   out2: boolean | null;
+  heartBeat: string;
 }
 
 /* create a Schema for Person */
@@ -42,5 +43,5 @@ export const lastPositionSchema = new Schema(LastPosition, {
   signal: { type: 'string' },
   out1: { type: 'boolean' },
   out2: { type: 'boolean' },
-  tx: { type: 'date' },
+  heartBeat: { type: 'date', sortable: true },
 });

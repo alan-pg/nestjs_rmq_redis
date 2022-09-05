@@ -21,8 +21,8 @@ import { PackageFailsService } from './package-fails/package-fails.service';
       defaultSubscribeErrorBehavior: MessageHandlerErrorBehavior.NACK,
       exchanges: [
         {
-          name: 'packages',
-          type: 'topic',
+          name: 'treatment',
+          type: 'direct',
           options: {
             durable: true,
             arguments: {

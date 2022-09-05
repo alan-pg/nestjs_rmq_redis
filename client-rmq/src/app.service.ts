@@ -30,36 +30,36 @@ export class AppService {
   }
 
   @RabbitSubscribe({
-    exchange: 'packages',
+    exchange: 'treatment',
     routingKey: 'package-position-route',
-    queue: 'position',
-    errorHandler: (channel: Channel, msg: ConsumeMessage, error: any) => {
-      console.log('errorHandler');
-    },
-    queueOptions: {
-      deadLetterExchange: 'package-dead-letter',
-      deadLetterRoutingKey: 'package-position-route',
-      durable: true,
-    },
+    queue: 'packages',
+
+    // queueOptions: {
+    //   deadLetterExchange: 'package-dead-letter',
+    //   deadLetterRoutingKey: 'package-position-route',
+    //   durable: true,
+    // },
   })
   public async pubSubHandlerPosition(
     msg: { data: any },
     amqpMsg: ConsumeMessage,
   ) {
-    console.log('x-death', amqpMsg.properties.headers['x-death']);
-    console.log('properties', amqpMsg.properties);
+    // console.log('x-death', amqpMsg.properties.headers['x-death']);
     this.count = this.count + 1;
 
-    const { tracker_model, data, cmd } = msg.data;
+    const dataString = amqpMsg.content.toString();
+    console.log('data received', JSON.parse(dataString));
 
-    const convertedData = discover({ model: tracker_model, data });
+    const { trackerModel, data, cmd } = JSON.parse(dataString);
+
+    const convertedData = discover({ model: trackerModel, data });
 
     if (convertedData.error) {
       console.log('error', convertedData.errorMessage);
       const { error } = await this.packageFailService.create({
         data: data,
         reason: convertedData.errorMessage,
-        trackerModel: tracker_model,
+        trackerModel: trackerModel,
         cmd,
       });
       if (error) {

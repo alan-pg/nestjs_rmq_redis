@@ -51,6 +51,7 @@ function handleHB(fields: string[]): TreatedHb {
       odometer: odometer(fields[14]),
       voltage: fields[19],
       satellite: satellite(fields[20]),
+      heartBeat: dateNow(),
     };
 
     return {

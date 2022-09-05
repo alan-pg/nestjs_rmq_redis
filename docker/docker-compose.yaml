@@ -10,13 +10,17 @@ services:
       - "15672:15672"
       - "5672:5672"
     restart: on-failure
-    volumes:
-      # - ./rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins
-      # - ./rabbitmq.config:/etc/rabbitmq/rabbitmq.config
-      # - ./rabbitmq-defs.json:/etc/rabbitmq/rabbitmq-defs.json
-      # - ./rmqinit/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-      # - ./rmqinit/definitions.json:/etc/rabbitmq/definitions.json:ro
-      - ./.rabbitmq_data:/var/lib/rabbitmq/mnesia
+    # volumes:
+    # - ./rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins
+    # - ./rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+    # - ./rabbitmq-defs.json:/etc/rabbitmq/rabbitmq-defs.json
+    # - ./rmqinit/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    # - ./rmqinit/definitions.json:/etc/rabbitmq/definitions.json:ro
+    # - ./.rabbitmq_data:/var/lib/rabbitmq/mnesia
+    networks:
+      - treatment-net
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -26,6 +30,8 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+    networks:
+      - treatment-net
     restart: on-failure
     volumes:
       - ./.redis_data:/data
@@ -38,9 +44,35 @@ services:
       - DB_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_DATABASE=treatment
+    networks:
+      - treatment-net
     volumes:
-      - ./.mysql_data:/data
+      - ./.mysql_data:/var/lib/mysql
     ports:
       - 3306:3306
     expose:
       - 3306
+  # elasticsearch:
+  #   container_name: es-container
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+  #   environment:
+  #     - xpack.security.enabled=false
+  #     - "discovery.type=single-node"
+  #   networks:
+  #     - treatment-net
+  #   ports:
+  #     - 9200:9200
+  # kibana:
+  #   container_name: kb-container
+  #   image: docker.elastic.co/kibana/kibana:8.3.2
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://es-container:9200
+  #   networks:
+  #     - treatment-net
+  #   depends_on:
+  #     - elasticsearch
+  #   ports:
+  #     - 5601:5601
+networks:
+  treatment-net:
+    driver: bridge
